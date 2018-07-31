@@ -1,0 +1,6 @@
+[package]
+name = "greeter"
+version = "0.1.0"
+authors = ["Fuyang Liu <liufu.ty@gmail.com>"]
+
+[dependencies]
