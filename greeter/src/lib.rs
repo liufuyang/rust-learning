@@ -1,13 +1,13 @@
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Language {
     English,
     Chinese,
     Unknown,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Greeter {
     lang: Language,
 }
@@ -19,9 +19,11 @@ impl Greeter {
         }
     }
 
-    fn with_language(mut self, lang: Language) -> Greeter {
-        self.lang = lang;
-        self
+    // use clone() to allow passing a borrowed self when calling greeter.with_language(self ...)
+    fn with_language(&self, lang: Language) -> Greeter {
+        let mut s = self.clone();
+        s.lang = lang;
+        s
     }
 }
 

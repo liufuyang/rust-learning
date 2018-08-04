@@ -10,7 +10,12 @@ fn main() {
     let secret_number = rand::thread_rng().gen_range(1, 101);
 
     // println!("The secret number is: {}", secret_number);
-
+    let x = vec![1; 50];
+    let mut a = 3;
+    let b = a;
+    let a: u32 = 4;
+    println!("{}", b);
+    println!("{:?}", x);
 
     loop {
         println!("Please input your guess.");
@@ -28,7 +33,6 @@ fn main() {
             }
         };
             
-
         match guess.cmp(&secret_number) {
             Ordering::Less => println!("Too small!"),
             Ordering::Greater => println!("Too big!"),
