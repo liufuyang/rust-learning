@@ -39,3 +39,17 @@
 
 //     println!("{}", owner);
 // }
+
+//////////////////////////////////////////////////
+
+fn main() {
+    let s1 = String::from("hello");
+
+    let len = calculate_length(&s1);
+
+    println!("'{}' has length: {}", s1, len);
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len() // or (*s).len() also works. s1.len() &s1.len() both works. Interesting...
+}
