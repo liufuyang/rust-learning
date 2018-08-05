@@ -20,10 +20,12 @@ impl Greeter {
     }
 
     // use clone() to allow passing a borrowed self when calling greeter.with_language(self ...)
-    fn with_language(&self, lang: Language) -> Greeter {
-        let mut s = self.clone();
-        s.lang = lang;
-        s
+    fn with_language(mut self, lang: Language) -> Greeter {
+        // let mut s = self.clone();
+        // s.lang = lang;
+        // s
+        self.lang = lang;
+        self
     }
 }
 
@@ -52,11 +54,12 @@ mod tests {
 
     #[test]
     fn greet_works() {
-        let greeter = Greeter::new();
+        let mut greeter = Greeter::new().with_language(Language::English);
         println!("{}", greeter);
         assert_eq!(format!("{}", greeter), "Hello Rust");
 
-        println!("{}", greeter.with_language(Language::English));
+        println!("{}", greeter);
+        greeter = greeter.with_language(Language::Chinese);
         println!("{}", greeter);
         // println!("{:?}", greeter);
     }
