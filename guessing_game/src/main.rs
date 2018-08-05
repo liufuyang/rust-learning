@@ -1,3 +1,4 @@
+#![feature(range_contains)]
 extern crate rand;
 
 use std::io;
@@ -5,6 +6,8 @@ use std::cmp::Ordering;
 use rand::Rng;
 
 fn main() {
+     use prime::*;
+
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1, 101);
@@ -25,15 +28,21 @@ fn main() {
         io::stdin().read_line(&mut guess)
             .expect("Failed to read line");
         
-        let guess: u32 = match guess.trim().parse() {
-            Ok(num) => num,
+        let guess: Guess = match guess.trim().parse::<u32>() {
+            Ok(num) => match (1..101).contains(&num) {
+                        true => Guess::new(num), // we have to do the check other wise Guess panics if created with value too big or small
+                        false => { 
+                            println!("Please type a number within range 1 to 100!");
+                            continue;
+                        }
+            },
             Err(_) => {
                 println!("Please type a number!");
                 continue;
             }
         };
             
-        match guess.cmp(&secret_number) {
+        match guess.value().cmp(&secret_number) {
             Ordering::Less => println!("Too small!"),
             Ordering::Greater => println!("Too big!"),
             Ordering::Equal => {
@@ -43,6 +52,27 @@ fn main() {
         }
 
         // println!("Size of the input is: {}", size);
-        println!("You guessed: {}", guess);
+        println!("You guessed: {}", guess.value());
+    }
+}
+
+
+mod prime {
+    pub struct Guess {
+        value: u32,
+    }
+
+    impl Guess {
+        pub fn new(value: u32) -> Guess {
+            if value < 1 || value > 100 {
+                panic!("Guess value must be between 1 and 100, got {}.", value);
+                // a hard example for making Guess never possible to be a value less than 1 or above 100
+            }
+            return Guess {value};
+        }
+
+        pub fn value(&self) -> u32 {
+            self.value
+        }
     }
 }
