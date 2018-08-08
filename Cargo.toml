@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "greeter",
+    "guessing_game",
+    "minigrep",
+]
