@@ -1,10 +1,11 @@
-use std::fs;
 use std::env;
 use std::error::Error;
+use std::fs;
 // use std::io::prelude::*; // contains various useful traits for doing I/O
 
 // This gives us flexibility to return error values that may be of different types in different error cases. This is what the dyn means, it's short for "dynamic."
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> { // Box<dyn Error>> means: the function will return a type that implements the Error trait, but we don’t have to specify what particular type the return value will be
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    // Box<dyn Error>> means: the function will return a type that implements the Error trait, but we don’t have to specify what particular type the return value will be
     let contents = fs::read_to_string(config.filename)?;
 
     let results = if config.case_sensitive {
@@ -42,12 +43,17 @@ impl Config {
 
         let case_sensitive = env::var("CASE_INSENSITIVE").is_err();
 
-        Ok(Config { query, filename, case_sensitive })
+        Ok(Config {
+            query,
+            filename,
+            case_sensitive,
+        })
     }
 }
 
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    contents.lines()
+    contents
+        .lines()
         .filter(|line| line.contains(query))
         .collect()
 }
@@ -77,10 +83,7 @@ Rust:
 safe, fast, productive.
 Pick three.";
 
-        assert_eq!(
-            vec!["safe, fast, productive."],
-            search(query, contents)
-        );
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 
     #[test]

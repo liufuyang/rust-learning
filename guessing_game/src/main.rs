@@ -1,12 +1,12 @@
 #![feature(range_contains)]
 extern crate rand;
 
-use std::io;
-use std::cmp::Ordering;
 use rand::Rng;
+use std::cmp::Ordering;
+use std::io;
 
 fn main() {
-     use prime::*;
+    use prime::*;
 
     println!("Guess the number!");
 
@@ -25,37 +25,37 @@ fn main() {
 
         let mut guess = String::new(); // guess address is 01, value is 123
 
-        io::stdin().read_line(&mut guess)
+        io::stdin()
+            .read_line(&mut guess)
             .expect("Failed to read line");
-        
+
         let guess: Guess = match guess.trim().parse::<u32>() {
             Ok(num) => match (1..101).contains(&num) {
-                        true => Guess::new(num), // we have to do the check other wise Guess panics if created with value too big or small
-                        false => { 
-                            println!("Please type a number within range 1 to 100!");
-                            continue;
-                        }
+                true => Guess::new(num), // we have to do the check other wise Guess panics if created with value too big or small
+                false => {
+                    println!("Please type a number within range 1 to 100!");
+                    continue;
+                }
             },
             Err(_) => {
                 println!("Please type a number!");
                 continue;
             }
         };
-            
+
         match guess.value().cmp(&secret_number) {
             Ordering::Less => println!("Too small!"),
             Ordering::Greater => println!("Too big!"),
             Ordering::Equal => {
                 println!("You win!");
                 break;
-            } 
+            }
         }
 
         // println!("Size of the input is: {}", size);
         println!("You guessed: {}", guess.value());
     }
 }
-
 
 mod prime {
     pub struct Guess {
@@ -68,7 +68,7 @@ mod prime {
                 panic!("Guess value must be between 1 and 100, got {}.", value);
                 // a hard example for making Guess never possible to be a value less than 1 or above 100
             }
-            return Guess {value};
+            return Guess { value };
         }
 
         pub fn value(&self) -> u32 {

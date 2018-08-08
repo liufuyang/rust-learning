@@ -2,21 +2,21 @@
 // fn main() {
 //     let mut owner = String::from("Hello, World");
 
-//     {   
+//     {
 //         let mut another_owner = owner; // passing ownership
 //         another_owner = String::from("Hello, New World");
 //         println!("{}", owner);  // this line cannot compile
 //         println!("{}", another_owner);
-//     } 
+//     }
 
-//     println!("{}", owner);  // this line cannot compile 
+//     println!("{}", owner);  // this line cannot compile
 // }
 
 // 2. When shared(borrowed), mutate not allowed. Or you can share immutalbe stuff.
 // fn main() {
 //     let mut owner = String::from("Hello, World");
 
-//     {   
+//     {
 //         let mut borrower = &owner; // shared borrow
 //         *borrower = String::from("Hello, New World"); // this line cannot compile
 //         println!("{}", owner);
@@ -30,7 +30,7 @@
 // fn main() {
 //     let mut owner = String::from("Hello, World");
 
-//     {   
+//     {
 //         let mut borrower = &mut owner; // mutable borrow
 //         *borrower = String::from("Hello, New World");;
 //         println!("{}", owner);  // this line cannot compile

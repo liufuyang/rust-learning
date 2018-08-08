@@ -41,8 +41,6 @@ impl fmt::Display for Greeter {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
