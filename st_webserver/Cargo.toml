@@ -1,0 +1,6 @@
+[package]
+name = "st_webserver"
+version = "0.1.0"
+authors = ["Fuyang Liu <liufuyang@users.noreply.github.com>"]
+
+[dependencies]
