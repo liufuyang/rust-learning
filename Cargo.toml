@@ -4,4 +4,5 @@ members = [
     "greeter",
     "guessing_game",
     "minigrep",
+    "trait_tip_1",
 ]
