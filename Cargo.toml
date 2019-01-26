@@ -5,4 +5,5 @@ members = [
     "guessing_game",
     "minigrep",
     "trait_tip_1",
+    "st_webserver",
 ]
