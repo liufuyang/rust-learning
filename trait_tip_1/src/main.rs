@@ -1,3 +1,4 @@
+#![feature(dbg_macro)]
 use std::fmt::Debug;
 
 // Trait can associate functions
@@ -83,7 +84,7 @@ where
 }
 
 // Trait Object
-fn make_food_party_dyn(cooks: Vec<Box<dyn CookGene>>) {
+fn make_food_party_dyn(cooks: &[Box<dyn CookGene>]) {
     println!("Making food party dyn now: ");
     for cook in cooks {
         println!("{}", cook.cook());
@@ -107,8 +108,9 @@ fn main() {
     make_food_party(&v);
 
     let v = vec![ADebug(2), ADebug(44)];
+    dbg!(&v); // trying some new feature here
     println!("\n--> {}", v.cook());
 
     let some_cooks: Vec<Box<CookGene>> = vec![Box::new(A {}), Box::new(22)];
-    make_food_party_dyn(some_cooks);
+    make_food_party_dyn(&some_cooks);
 }
