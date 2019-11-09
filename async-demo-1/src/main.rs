@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Hello, world!");
     drop(chan_pages_s);
-    drop(chan_data_s); // close sender from current thread, so to allow collecting on receiver to continue
+    drop(chan_data_s); // close sender from current thread, so to allow collecting on receiver to continue (when other senders in other threads are dropped)
 
     let result_list: Vec<usize> = chan_data_r.iter().collect();
     println!("number of result_list: {}", result_list.len());
@@ -62,6 +62,9 @@ async fn get_content(n: String, sender: Sender<String>) {
     // resulting only 2 tasks can be done for each second, as we have only 2 thread.
     // thread::sleep(std::time::Duration::from_secs(1));
 
+    // Which means, in order for this async IO task works well, all internal 
+    // call here in this function should be async (with .await) and not making it blocking!
+
     println!(
         "[{}]: Async fetch and send page content {}...",
         thread::current().name().unwrap_or("?"),
@@ -84,6 +87,8 @@ async fn analyze_content(receiver: Receiver<String>, sender: Sender<usize>) {
 
         // As we have 10 workers and 10 thread, this would be the same effect above
         // thread::sleep(std::time::Duration::from_secs(1));
+        
+        // Thus, by design this method call can have CPU blocking call.
 
         println!(
             "[{}]: Async analysis and send data content {}...",
