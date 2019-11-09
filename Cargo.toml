@@ -7,4 +7,5 @@ members = [
     "trait_tip_1",
     "st_webserver",
     "vec_ref_slice",
+    "async-demo-1",
 ]
