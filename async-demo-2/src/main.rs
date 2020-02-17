@@ -14,14 +14,19 @@ type CityNumber = String;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Runtime for IO related tasks, give few cores for it
-    let rt_fetching = Builder::new()
+    let mut rt_fetching = Builder::new()
         .core_threads(4)
-        .name_prefix("async-io-thread-")
+        .thread_name("async-io-thread-pool")
+        .threaded_scheduler()
+        .enable_time()
+        .enable_io()
         .build()?;
     // Runtime for CPU intensive tasks, give more cores for it
-    let rt_analyzing = Builder::new()
+    let mut rt_analyzing = Builder::new()
         .core_threads(12)
-        .name_prefix("cpu-intensive-thread-")
+        .thread_name("cpu-intensive-thread-pool")
+        .threaded_scheduler()
+        .enable_time()
         .build()?;
 
     // Channels to pass on fetching (IO task) results
@@ -58,8 +63,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let map: Map = maps.into_par_iter().reduce_with(merge_maps).unwrap();
     println!("number of unique words: {}", map.len());
 
-    rt_fetching.shutdown_on_idle();
-    rt_analyzing.shutdown_on_idle();
     Ok(())
 }
 

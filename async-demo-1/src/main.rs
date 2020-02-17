@@ -1,4 +1,5 @@
 use tokio::runtime::Builder;
+use tokio::time::delay_for;
 
 use crossbeam::crossbeam_channel::{bounded, unbounded, Receiver, Sender};
 
@@ -6,14 +7,19 @@ use std::thread;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Runtime for IO related tasks, give few cores for it
-    let rt_fetching = Builder::new()
+    let mut rt_fetching = Builder::new()
         .core_threads(2)
-        .name_prefix("async-io-thread-")
+        .thread_name("async-io-thread-pool")
+        .threaded_scheduler()
+        .enable_time()
         .build()?;
+
     // Runtime for CPU intensive tasks, give more cores for it
-    let rt_analyzing = Builder::new()
+    let mut rt_analyzing = Builder::new()
         .core_threads(10)
-        .name_prefix("cpu-intensive-thread-")
+        .thread_name("cpu-intensive-thread-pool")
+        .threaded_scheduler()
+        .enable_time()
         .build()?;
 
     // Channels to pass on fetching (IO task) results
@@ -44,8 +50,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sum: usize = result_list.iter().sum::<usize>();
     println!("sum of result_list: {}", sum);
 
-    rt_fetching.shutdown_on_idle();
-    rt_analyzing.shutdown_on_idle();
     Ok(())
 }
 
@@ -55,11 +59,11 @@ async fn get_content(n: String, sender: Sender<String>) {
     // We can also simulate some CPU delay here
     // Resulting in each worker is delayed by 1s, 2 thread, 100 workers
     // with 100 data, should be finished within 1 seconds.
-    let simulate_delay = tokio::clock::now() + std::time::Duration::from_secs(1);
-    tokio::timer::delay(simulate_delay).await;
+    delay_for(std::time::Duration::from_secs(1)).await;
 
     // If you try below with blocking the actual thread, the worker thread will be blocked
     // resulting only 2 tasks can be done for each second, as we have only 2 thread.
+    // With 100 data, this will cost 50 seconds to finish this step
     // thread::sleep(std::time::Duration::from_secs(1));
 
     // Which means, in order for this async IO task works well, all internal 
@@ -82,8 +86,7 @@ async fn analyze_content(receiver: Receiver<String>, sender: Sender<usize>) {
         // We can also simulate some CPU delay here
         // Resulting in each thread is delayed by 1s, 10 workers, 10 block thread,
         // with 100 data, should be finished within 10 seconds.
-        let simulate_delay = tokio::clock::now() + std::time::Duration::from_secs(1);
-        tokio::timer::delay(simulate_delay).await;
+        delay_for(std::time::Duration::from_secs(1)).await;
 
         // As we have 10 workers and 10 thread, this would be the same effect above
         // thread::sleep(std::time::Duration::from_secs(1));
