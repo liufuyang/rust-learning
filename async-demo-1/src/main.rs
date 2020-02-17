@@ -5,8 +5,7 @@ use crossbeam::crossbeam_channel::{bounded, unbounded, Receiver, Sender};
 
 use std::thread;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Runtime for IO related tasks, give few cores for it
     let mut rt_fetching = Builder::new()
         .core_threads(2)
