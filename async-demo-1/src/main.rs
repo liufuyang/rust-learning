@@ -9,13 +9,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Runtime for IO related tasks, give few cores for it
     let mut rt_fetching = Builder::new()
         .core_threads(2)
-        .thread_name("async-io-thread-")
+        .thread_name("async-io-thread-pool")
+        .threaded_scheduler()
+        .enable_time()
         .build()?;
 
     // Runtime for CPU intensive tasks, give more cores for it
     let mut rt_analyzing = Builder::new()
         .core_threads(10)
-        .thread_name("cpu-intensive-thread-")
+        .thread_name("cpu-intensive-thread-pool")
+        .threaded_scheduler()
+        .enable_time()
         .build()?;
 
     // Channels to pass on fetching (IO task) results
@@ -46,8 +50,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sum: usize = result_list.iter().sum::<usize>();
     println!("sum of result_list: {}", sum);
 
-    //rt_fetching.shutdown_on_idle();
-    //rt_analyzing.shutdown_on_idle();
     Ok(())
 }
 
@@ -61,6 +63,7 @@ async fn get_content(n: String, sender: Sender<String>) {
 
     // If you try below with blocking the actual thread, the worker thread will be blocked
     // resulting only 2 tasks can be done for each second, as we have only 2 thread.
+    // With 100 data, this will cost 50 seconds to finish this step
     // thread::sleep(std::time::Duration::from_secs(1));
 
     // Which means, in order for this async IO task works well, all internal 
