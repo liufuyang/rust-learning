@@ -1,9 +1,8 @@
+use std::thread;
+
+use crossbeam::crossbeam_channel::{bounded, Receiver, Sender, unbounded};
 use tokio::runtime::Builder;
 use tokio::time::delay_for;
-
-use crossbeam::crossbeam_channel::{bounded, unbounded, Receiver, Sender};
-
-use std::thread;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Runtime for IO related tasks, give few cores for it
@@ -55,7 +54,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn get_content(n: String, sender: Sender<String>) {
     // TODO: later on use some .await call to get real pages and then send content to sender
-    
+
     // We can also simulate some CPU delay here
     // Resulting in each worker is delayed by 1s, 2 thread, 100 workers
     // with 100 data, should be finished within 1 seconds.
@@ -90,7 +89,7 @@ async fn analyze_content(receiver: Receiver<String>, sender: Sender<usize>) {
 
         // As we have 10 workers and 10 thread, this would be the same effect above
         // thread::sleep(std::time::Duration::from_secs(1));
-        
+
         // Thus, by design this method call can have CPU blocking call.
 
         println!(
