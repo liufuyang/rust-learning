@@ -1,7 +1,7 @@
-use std::sync::atomic::AtomicBool;
-use std::sync::atomic::Ordering::{Acquire, Release};
 use std::cell::UnsafeCell;
 use std::ops::{Deref, DerefMut};
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering::{Acquire, Release};
 
 /// To be able to provide a fully safe interface, we need to tie the unlocking operation to
 /// the end of the &mut T. We can do that by wrapping this reference in our own type that
@@ -19,7 +19,6 @@ pub struct SpinLock<T> {
 }
 
 unsafe impl<T> Sync for SpinLock<T> where T: Send {}
-
 
 impl<T> SpinLock<T> {
     pub const fn new(value: T) -> Self {

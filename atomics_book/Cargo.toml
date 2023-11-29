@@ -10,3 +10,7 @@ edition = "2021"
 [[example]]
 name = "spin_lock"
 path = "spin_lock_example.rs"
+
+[[example]]
+name = "channel"
+path = "channel_example.rs"

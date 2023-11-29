@@ -1,6 +1,6 @@
 use std::thread;
 
-use crossbeam::crossbeam_channel::{bounded, Receiver, Sender, unbounded};
+use crossbeam::crossbeam_channel::{bounded, unbounded, Receiver, Sender};
 use tokio::runtime::Builder;
 use tokio::time::delay_for;
 
@@ -65,7 +65,7 @@ async fn get_content(n: String, sender: Sender<String>) {
     // With 100 data, this will cost 50 seconds to finish this step
     // thread::sleep(std::time::Duration::from_secs(1));
 
-    // Which means, in order for this async IO task works well, all internal 
+    // Which means, in order for this async IO task works well, all internal
     // call here in this function should be async (with .await) and not making it blocking!
 
     println!(

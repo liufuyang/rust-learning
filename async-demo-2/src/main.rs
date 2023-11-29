@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
 use std::thread;
 
 use crossbeam::crossbeam_channel::{bounded, Receiver, Sender};
@@ -74,9 +74,13 @@ async fn get_content(n: String, city: String, sender: Sender<(CityNumber, String
         .text()
         .await
         .unwrap();
-    println!("[{}] - {} - Page got for city: {}, character size {}",
-             thread::current().name().unwrap_or("?"),
-             n, city, body.len());
+    println!(
+        "[{}] - {} - Page got for city: {}, character size {}",
+        thread::current().name().unwrap_or("?"),
+        n,
+        city,
+        body.len()
+    );
     sender.send((n, body)).expect("get_content send error");
 }
 
@@ -86,7 +90,8 @@ async fn analyze_content(receiver: Receiver<(CityNumber, String)>, sender: Sende
 
         println!(
             "[{}]: Async analysis and send data content {}...",
-            thread::current().name().unwrap_or("?"), n
+            thread::current().name().unwrap_or("?"),
+            n
         );
         sender.send(map).expect("analyze_content send error");
     }

@@ -10,7 +10,6 @@ pub struct SpinLockUnsafe<T> {
 
 unsafe impl<T> Sync for SpinLockUnsafe<T> where T: Send {}
 
-
 impl<T> SpinLockUnsafe<T> {
     pub const fn new(value: T) -> Self {
         Self {
@@ -19,14 +18,12 @@ impl<T> SpinLockUnsafe<T> {
         }
     }
 
-
     pub fn lock(&self) -> &mut T {
         while self.locked.swap(true, Acquire) {
             std::hint::spin_loop();
         }
         unsafe { &mut *self.value.get() }
     }
-
 
     /// Safety: The &mut T from lock() must be gone!
     /// (And no cheating by keeping reference to fields of that T around!)
