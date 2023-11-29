@@ -1,8 +1,12 @@
 [package]
-name = "atomics_book_spin_lock"
+name = "atomics_book"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[[example]]
+name = "spin_lock"
+path = "spin_lock_example.rs"

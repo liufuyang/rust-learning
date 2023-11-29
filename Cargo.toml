@@ -10,5 +10,5 @@ members = [
     "vec_ref_slice",
     "async-demo-1",
     "async-demo-2",
-    "atomics_book_spin_lock",
+    "atomics_book",
 ]

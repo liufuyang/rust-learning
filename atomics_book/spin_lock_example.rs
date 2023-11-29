@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use std::thread;
-use atomics_book_spin_lock::spin_lock::r#unsafe::SpinLockUnsafe;
-use atomics_book_spin_lock::spin_lock::safe::SpinLock;
+use atomics_book::spin_lock::r#unsafe::SpinLockUnsafe;
+use atomics_book::spin_lock::safe::SpinLock;
 
 fn main() {
     let lock_unsafe = SpinLockUnsafe::new(0);
