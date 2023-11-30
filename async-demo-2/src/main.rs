@@ -4,9 +4,10 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::thread;
 
-use crossbeam::crossbeam_channel::{bounded, Receiver, Sender};
+use crossbeam::channel::{bounded, Receiver, Sender};
 use rayon::prelude::*;
 use reqwest;
+use reqwest::Client;
 use tokio::runtime::Builder;
 
 type Map = HashMap<String, u32>;
@@ -14,27 +15,30 @@ type CityNumber = String;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Runtime for IO related tasks, give few cores for it
-    let mut rt_fetching = Builder::new()
-        .core_threads(4)
+    let mut rt_fetching = Builder::new_multi_thread()
+        .worker_threads(4)
         .thread_name("async-io-thread-pool")
-        .threaded_scheduler()
+        .thread_stack_size(3 * 1024 * 1024)
         .enable_time()
         .enable_io()
         .build()?;
     // Runtime for CPU intensive tasks, give more cores for it
-    let mut rt_analyzing = Builder::new()
-        .core_threads(12)
+    let mut rt_analyzing = Builder::new_multi_thread()
+        .worker_threads(12)
         .thread_name("cpu-intensive-thread-pool")
-        .threaded_scheduler()
+        .thread_stack_size(3 * 1024 * 1024)
         .enable_time()
         .build()?;
+
+    let client = reqwest::ClientBuilder::new().build().unwrap();
 
     // Channels to pass on fetching (IO task) results
     let (chan_pages_s, chan_pages_r) = bounded(500);
     // Channels to pass on analyzing (CPU task) results
     let (chan_data_s, chan_data_r) = bounded(32);
 
-    rt_fetching.block_on(async {
+
+    rt_fetching.spawn(async move {
         // reading all the cities from file cities.txt and each one start a task to get the page content
         let f = File::open("async-demo-2/cities.txt").expect("Cannot open cities.txt");
         let f = BufReader::new(f);
@@ -44,19 +48,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let tokens: Vec<&str> = line.split(",").collect();
             let n = tokens[0];
             let city = tokens[1].replace(" ", "_");
-            tokio::spawn(get_content(n.to_owned(), city, chan_pages_s.clone()));
+            tokio::spawn(get_content(client.clone(), n.to_owned(), city, chan_pages_s.clone()));
         }
+        drop(chan_pages_s);
     });
 
-    rt_analyzing.block_on(async {
+    rt_analyzing.spawn(async move {
         // using 10 workers doing CPU intensive tasks
-        for _ in 0..12 {
+        for _ in 0..10 {
             tokio::spawn(analyze_content(chan_pages_r.clone(), chan_data_s.clone()));
         }
+        drop(chan_data_s); // close sender from current thread, so to allow collecting on receiver to continue (when other senders in other threads are dropped)
     });
-
-    drop(chan_pages_s);
-    drop(chan_data_s); // close sender from current thread, so to allow collecting on receiver to continue (when other senders in other threads are dropped)
 
     let maps: Vec<Map> = chan_data_r.iter().collect();
     println!("number of maps: {}", maps.len());
@@ -66,22 +69,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn get_content(n: String, city: String, sender: Sender<(CityNumber, String)>) {
+async fn get_content(client: Client, n: String, city: String, sender: Sender<(CityNumber, String)>) {
     let url = format!("https://en.wikipedia.org/wiki/{}", city);
-    let body = reqwest::get(url.as_str())
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
-    println!(
-        "[{}] - {} - Page got for city: {}, character size {}",
-        thread::current().name().unwrap_or("?"),
-        n,
-        city,
-        body.len()
-    );
-    sender.send((n, body)).expect("get_content send error");
+    let body = client.get(url.as_str()).send().await;
+
+    match body {
+        Ok(res) => {
+            let body = res.text().await.unwrap();
+            println!(
+                "[{}] - {} - Page got for city: {}, character size {}",
+                thread::current().name().unwrap_or("?"),
+                n,
+                city,
+                body.len()
+            );
+            sender.send((n, body)).expect("get_content send error");
+        },
+        Err(e) => println!(
+            "[{}] - {} - Error getting page for city: {}, error: {}",
+            thread::current().name().unwrap_or("?"),
+            n,
+            city,
+            e.to_string()
+        )
+    }
+
 }
 
 async fn analyze_content(receiver: Receiver<(CityNumber, String)>, sender: Sender<Map>) {

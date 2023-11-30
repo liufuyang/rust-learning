@@ -1,0 +1,15 @@
+1,New York,New York,8405837,4.8%
+2,Los Angeles,California,3884307,4.8%
+3,Chicago,Illinois,2718782,-6.1%
+4,Houston,Texas,2195914,11.0%
+5,Philadelphia,Pennsylvania,1553165,2.6%
+6,Phoenix,Arizona,1513367,14.0%
+7,San Antonio,Texas,1409019,21.0%
+8,San Diego,California,1355896,10.5%
+9,Dallas,Texas,1257676,5.6%
+10,San Jose,California,998537,10.5%
+11,Austin,Texas,885400,31.7%
+12,Indianapolis,Indiana,843393,7.8%
+13,Jacksonville,Florida,842583,14.3%
+14,San Francisco,California,837442,7.7%
+15,Columbus,Ohio,822553,14.8%
