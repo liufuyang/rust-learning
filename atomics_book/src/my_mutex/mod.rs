@@ -46,6 +46,15 @@ impl<T> MyMutex<T> {
     }
 }
 
+impl<T> Drop for Guard<'_, T> {
+    fn drop(&mut self) {
+        // Set the state back to 0: unlocked.
+        self.lock.state.store(0, Release);
+        // Wake up one of the waiting threads, if any.
+        wake_one(&self.lock.state);
+    }
+}
+
 impl<T> Deref for Guard<'_, T> {
     type Target = T;
     fn deref(&self) -> &T {
@@ -60,12 +69,5 @@ impl<T> DerefMut for Guard<'_, T> {
         // Safety: The very existence of this Guard
         // guarantees we've exclusively locked the lock.
         unsafe { &mut *self.lock.value.get() }
-    }
-}
-
-impl<T> Drop for Guard<'_, T> {
-    fn drop(&mut self) {
-        self.lock.state.store(0, Release);
-        wake_one(&self.lock.state);
     }
 }
