@@ -7,15 +7,24 @@ edition = "2021"
 
 [dependencies]
 tokio = {version = "1.34.0", features = ["full"]}
+atomic-wait = "1.1.0"
 
 [[example]]
 name = "spin_lock"
-path = "spin_lock_example.rs"
+path = "examples/spin_lock_example.rs"
+
+[[example]]
+name = "my_mutex"
+path = "examples/my_mutex_example.rs"
 
 [[example]]
 name = "channel"
-path = "channel_example.rs"
+path = "examples/channel_example.rs"
+
+[[example]]
+name = "x86_work_but_not_arm_demo"
+path = "examples/x86_work_but_not_arm_demo.rs"
 
 [[example]]
 name = "test1"
-path = "test1.rs"
+path = "examples/test1.rs"
